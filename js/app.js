@@ -9,26 +9,68 @@ const MESSAGE_INPUT = document.querySelector('#message');
 const SEND_BTN = document.querySelector('#sendBtn');
 const RESET_BTN = document.querySelector('#resetBtn');
 
-const SPINNER_DIV = document.querySelector('#spinner');
-
 registerEventListeners();
 
 
 function registerEventListeners() {
-    // init
+    // INIT
     document.addEventListener('DOMContentLoaded', initApp);
-    // inputs
+
+    // INPUT
     EMAIL_INPUT.addEventListener('blur', validateForm);
     SUBJECT_INPUT.addEventListener('blur', validateForm);
     MESSAGE_INPUT.addEventListener('blur', validateForm);
+
+    // BTN
+    FORM.addEventListener('submit', sendForm);
+    RESET_BTN.addEventListener('click', resetForm);
 }
 
 
 function initApp() {
-    console.log('app iniciada...');
+    console.log('app started...');
 
     SEND_BTN.disabled = true;
     SEND_BTN.classList.add('cursor-not-allowed', 'opacity-50');
+}
+
+function resetForm(e) {
+    FORM.reset();
+    e.preventDefault();
+
+    if( document.querySelector('.error') ) {
+        document.querySelector('.error').remove();
+    }
+
+    EMAIL_INPUT.classList.remove('border-red-500', 'border-green-500');
+    SUBJECT_INPUT.classList.remove('border-red-500', 'border-green-500');
+    MESSAGE_INPUT.classList.remove('border-red-500', 'border-green-500');
+}
+
+function sendForm(e) {
+    e.preventDefault();
+
+    const SPINNER_DIV = document.querySelector('#spinner');
+    SPINNER_DIV.style.display = 'flex';
+
+    // Display message after three secs
+    setTimeout(() => {
+        SPINNER_DIV.style.display = 'none';
+
+        const SUCCES_P = document.createElement('p');
+    
+        SUCCES_P.classList.add('uppercase', 'text-center', 'text-white', 'my-10', 'mb-5', 'font-bold', 'bg-green-500');
+        SUCCES_P.textContent = 'Your email has been sent!';
+
+        FORM.insertBefore(SUCCES_P, document.querySelector('.justify-between') );
+
+        // Delete message after three secs and reset the form
+        setTimeout(() => {
+           SUCCES_P.remove(); 
+           resetForm();
+           initApp();
+        }, 5000);
+    }, 3000);
 }
 
 function validateForm(e) {
@@ -49,8 +91,16 @@ function validateForm(e) {
         showError(e);
     }
 
+    // Success
     if( document.querySelectorAll('.border-green-500').length === 3 ) {
-        // Show spinner and message
+        // Remove error element 
+        if( document.querySelector('.error') ) {
+            document.querySelector('.error').remove();
+        }
+
+        // Activate SEND btn
+        SEND_BTN.disabled = false;
+        SEND_BTN.classList.remove('cursor-not-allowed', 'opacity-50');
     }
 }
 
@@ -92,11 +142,9 @@ function showError(e, mssg ) {
     }
 
     if( document.querySelector('.error ') ) {
-        console.log('aqui');
         const ERROR_P = document.querySelector('.error ');
         ERROR_P.textContent = error;
     } else {
-        console.log('creado');
         const ERROR_P = document.createElement('p');
         ERROR_P.classList.add('border', 'border-red-500', 'background-red-100', 'text-center', 'mt-5', 'p3', 'error');
         ERROR_P.style.color = "red";
